@@ -1,0 +1,64 @@
+---
+title: "DEBERES"
+format: 
+  revealjs:
+    embed-resources: true 
+editor: visual
+execute: 
+  echo: true
+---
+
+## Buscamos replicar el siguiente gráfico
+
+![](images/clipboard-168326274.png)
+
+------------------------------------------------------------------------
+
+## Carga y filtrado de datos
+
+```{r}
+#| code-fold: true
+library(tidyverse)
+accidentes <- read_csv(file = "./datos/accidentes.csv")
+```
+
+-   Filtrado
+
+```{r}
+accident <- 
+  accidentes |> filter(tipo_persona %in% c("Conductor", "Pasajero", "Peatón")) |> 
+  summarise("n_accidentes" = n(), .by = c(tipo_persona, distrito)) |> mutate(distrito = str_to_lower(distrito))
+
+accident
+```
+
+------------------------------------------------------------------------
+
+## Código
+
+```{r}
+ggplot(accident) + #1ª capa:le decimos que grafico queremos hacer 
+  geom_col(aes(x = distrito, y = n_accidentes, fill = tipo_persona), alpha = 0.65) + #capa geométrica 
+  scale_fill_manual(values = c("grey", "#e8d28c", "#83baec")) + # PORQUE HAY QUE USAR ESO Y NO : ggthemes::scale_color_colorblind() ???
+  scale_y_continuous(breaks = seq(0, 3000, by = 250)) + #para la escala del eje y
+  labs(
+    x = "Distritos de Madrid",
+    y = "Número de accidentes", 
+    fill = "Implicado",
+    title = "Accidentes en la ciudad de Madrid", 
+    caption = "Autor: Laura. Datos: accidentes") +
+  theme_minimal()+
+  theme(
+    plot.title = element_text(family = "Comic Sans MS", colour = "black"), 
+    axis.text.x = element_text(angle = 30), #para girar el nombre de los ejes
+    panel.background = element_rect(fill = "white"), #para cambiar el color del fondo de la grafica
+    legend.position = "bottom") +
+  guides(alpha = "none") #que es esto?
+  
+```
+
+------------------------------------------------------------------------
+
+## RESULTADO
+
+![](images/clipboard-770784693.png)
